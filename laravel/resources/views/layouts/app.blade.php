@@ -6,6 +6,11 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+        
+        <!-- PWA Manifest & Icons -->
+        <link rel="manifest" href="/manifest.webmanifest">
+        <link rel="apple-touch-icon" href="/icons/icon-192.png">
+        <meta name="theme-color" content="#10B981">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -34,7 +39,17 @@
             </main>
         </div>
 
-        @include('layouts.partials.bottom-nav')
+    @include('layouts.partials.bottom-nav')
 
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered!', reg.scope))
+                    .catch(err => console.log('SW failed: ', err));
+            });
+        }
+    </script>
     </body>
 </html>

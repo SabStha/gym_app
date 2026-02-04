@@ -27,6 +27,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/offline', 'offline');
+
 // Dashboard Route with Controller
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
