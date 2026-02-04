@@ -16,6 +16,10 @@ class Exercise extends Model
         'is_default',
     ];
 
+    protected $casts = [
+        'is_default' => 'boolean',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

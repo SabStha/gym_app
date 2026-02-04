@@ -34,6 +34,6 @@ class WorkoutExercise extends Model
 
     public function workoutSets()
     {
-        return $this->hasMany(WorkoutSet::class)->orderBy('set_number');
+        return $this->hasMany(WorkoutSet::class);
     }
 }

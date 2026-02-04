@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Workout extends Model
 {
@@ -13,6 +14,8 @@ class Workout extends Model
         'user_id',
         'routine_day_id',
         'workout_date',
+        'started_at',
+        'finished_at',
         'duration_min',
         'status',
         'note',
@@ -20,7 +23,25 @@ class Workout extends Model
 
     protected $casts = [
         'workout_date' => 'datetime',
+        'started_at' => 'datetime',
+        'finished_at' => 'datetime',
     ];
+
+    /**
+     * Get the workout duration in minutes relative to start/finish timestamps.
+     */
+    public function getDurationMinutesAttribute()
+    {
+        if ($this->started_at && $this->finished_at) {
+            return $this->started_at->diffInMinutes($this->finished_at);
+        }
+
+        if ($this->duration_min) {
+            return $this->duration_min;
+        }
+
+        return '--';
+    }
 
     public function user()
     {

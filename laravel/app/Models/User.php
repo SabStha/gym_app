@@ -41,14 +41,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
     public function userProfile()
     {
         return $this->hasOne(UserProfile::class);
-    }
-
-    public function exercises()
-    {
-        return $this->hasMany(Exercise::class);
     }
 
     public function routines()
@@ -59,5 +55,10 @@ class User extends Authenticatable
     public function workouts()
     {
         return $this->hasMany(Workout::class);
+    }
+
+    public function exercises()
+    {
+        return $this->hasMany(Exercise::class);
     }
 }

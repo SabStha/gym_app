@@ -22,6 +22,6 @@ class RoutineDay extends Model
 
     public function dayExercises()
     {
-        return $this->hasMany(DayExercise::class)->orderBy('order_index');
+        return $this->hasMany(DayExercise::class);
     }
 }
