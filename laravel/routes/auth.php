@@ -9,13 +9,20 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\RegistrationWizardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-                ->name('register');
+    // Wizard Routes
+    Route::get('register', function() {
+        return redirect()->route('register.wizard', ['step' => 1]);
+    })->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::get('register/step/{step}', [RegistrationWizardController::class, 'showStep'])
+        ->name('register.wizard');
+
+    Route::post('register/step/{step}', [RegistrationWizardController::class, 'postStep'])
+        ->name('register.wizard.post');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
                 ->name('login');

@@ -23,8 +23,17 @@ use App\Http\Controllers\ProgressController;
 
 // Redirect root to dashboard if logged in, otherwise login
 // Public Landing Page
+// Splash Screen (Root)
 Route::get('/', function () {
-    return view('welcome');
+    return view('intro');
+});
+
+// Onboarding Flow
+Route::get('/onboarding/{step}', function ($step) {
+    if (!in_array($step, ['1', '2', '3'])) {
+        return redirect('/onboarding/1');
+    }
+    return view('onboarding', compact('step'));
 });
 
 Route::view('/offline', 'offline');

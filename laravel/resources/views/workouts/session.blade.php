@@ -94,7 +94,7 @@
                                         @if($suggData && $suggData['weight'] !== null)
                                             <!-- Apply Suggestion Button -->
                                             <button type="button" 
-                                                    class="text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-md transition-colors flex items-center gap-1"
+                                                    class="text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 touch-manipulation select-none"
                                                     onclick="applySuggestion({{ $we->id }}, {{ $setNum }}, {{ $suggData['weight'] }}, '{{ $suggData['reps'] }}')">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                                                 Apply
@@ -116,14 +116,14 @@
                                         <div>
                                             <label class="block text-[10px] uppercase text-gray-400 font-bold mb-1 text-center">Weight (kg)</label>
                                             <div class="flex items-center">
-                                                <button type="button" onclick="stepValue(this, -2.5)" class="h-10 w-10 flex items-center justify-center rounded-l-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg">-</button>
+                                                <button type="button" onclick="stepValue(this, -2.5)" class="h-10 w-10 flex items-center justify-center rounded-l-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg touch-manipulation select-none">-</button>
                                                 <input type="number" step="0.5" 
                                                        name="sets[{{ $we->id }}][{{ $i }}][weight]" 
                                                        value="{{ $setRecord ? $setRecord->weight_kg : '' }}"
                                                        class="h-10 w-full border-y border-x-0 border-gray-200 text-center font-bold text-gray-900 focus:ring-0 z-10 weight-input p-0" 
                                                        placeholder="-"
                                                 >
-                                                <button type="button" onclick="stepValue(this, 2.5)" class="h-10 w-10 flex items-center justify-center rounded-r-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg">+</button>
+                                                <button type="button" onclick="stepValue(this, 2.5)" class="h-10 w-10 flex items-center justify-center rounded-r-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg touch-manipulation select-none">+</button>
                                             </div>
                                         </div>
 
@@ -131,14 +131,14 @@
                                         <div>
                                             <label class="block text-[10px] uppercase text-gray-400 font-bold mb-1 text-center">Reps</label>
                                             <div class="flex items-center">
-                                                <button type="button" onclick="stepValue(this, -1)" class="h-10 w-10 flex items-center justify-center rounded-l-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg">-</button>
+                                                <button type="button" onclick="stepValue(this, -1)" class="h-10 w-10 flex items-center justify-center rounded-l-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg touch-manipulation select-none">-</button>
                                                 <input type="number" 
                                                        name="sets[{{ $we->id }}][{{ $i }}][reps]" 
                                                        value="{{ $setRecord ? $setRecord->reps : '' }}"
                                                        class="h-10 w-full border-y border-x-0 border-gray-200 text-center font-bold text-gray-900 focus:ring-0 z-10 reps-input p-0" 
                                                        placeholder="-"
                                                 >
-                                                <button type="button" onclick="stepValue(this, 1)" class="h-10 w-10 flex items-center justify-center rounded-r-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg">+</button>
+                                                <button type="button" onclick="stepValue(this, 1)" class="h-10 w-10 flex items-center justify-center rounded-r-xl bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors font-bold text-lg touch-manipulation select-none">+</button>
                                             </div>
                                         </div>
                                     </div>
