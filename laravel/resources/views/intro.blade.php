@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta name="theme-color" content="#10B981">
+    
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
     <title>{{ config('app.name', 'Gym Companion') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -27,22 +32,71 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if authenticated (via meta tag or server injection, simpler: assume guest for root /)
-            // But we can check localStorage for onboarding
-            
-            setTimeout(() => {
-                const hasSeenOnboarding = localStorage.getItem('onboarding_seen');
+        class SplashController {
+            constructor() {
+                this.timerId = null;
+                // Check auth status rendered from Blade
+                this.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+                this.redirectUrl = this.isAuthenticated ? "{{ route('dashboard') }}" : "/onboarding/1";
+                this.delay = 1200; // 1.2s
                 
-                if (hasSeenOnboarding) {
-                    // Go to login/register (or dashboard if already auth, handled by middleware usually)
-                    window.location.href = "{{ route('login') }}"; 
-                } else {
-                    // First time
-                    window.location.href = "/onboarding/1";
+                this.init();
+            }
+
+            init() {
+                // Listen for PWA events
+                window.addEventListener('pwa-banner-shown', () => this.pause());
+                window.addEventListener('pwa-banner-dismissed', () => this.resume());
+
+                // Start initial timer
+                this.start();
+            }
+
+            start() {
+                console.log('Splash timer started');
+                this.timerId = setTimeout(() => {
+                    this.navigate();
+                }, this.delay);
+            }
+
+            pause() {
+                if (this.timerId) {
+                    console.log('Splash timer paused (PWA Banner)');
+                    clearTimeout(this.timerId);
+                    this.timerId = null;
                 }
-            }, 1200); // 1.2s splash
+            }
+
+            resume() {
+                console.log('Splash timer resumed');
+                // Immediate navigation or short restart
+                // Since this is a simple splash, simply navigating now is fine
+                // or we could restart the full delay. Let's restart a short delay for smoothness.
+                this.timerId = setTimeout(() => {
+                    this.navigate();
+                }, 500); 
+            }
+
+            navigate() {
+                window.location.href = this.redirectUrl;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+             new SplashController();
         });
     </script>
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered!', reg.scope))
+                    .catch(err => console.log('SW failed: ', err));
+            });
+        }
+    </script>
+    
+    <x-pwa-install-banner />
 </body>
 </html>

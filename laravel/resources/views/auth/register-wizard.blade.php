@@ -132,9 +132,10 @@
 
                     <div id="target-weight-container" class="{{ $goal == 'maintain' ? 'hidden' : '' }}">
                         <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Target Weight (kg)</label>
-                        <input type="number" step="0.1" name="target_weight_kg" value="{{ old('target_weight_kg', $data['target_weight_kg'] ?? '') }}" 
+                        <input type="number" step="0.1" min="1" max="300" inputmode="decimal" name="target_weight_kg" value="{{ old('target_weight_kg', $data['target_weight_kg'] ?? '') }}" 
                                class="block w-full h-14 rounded-2xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 text-lg px-4 text-center font-bold shadow-sm"
                                placeholder="Target">
+                        <x-input-error :messages="$errors->get('target_weight_kg')" class="mt-2 text-sm text-red-500 ml-1" />
                     </div>
                 </div>
 

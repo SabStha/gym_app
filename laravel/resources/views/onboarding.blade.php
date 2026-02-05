@@ -3,7 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#10B981">
+    
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
     <title>Welcome - {{ config('app.name') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -70,10 +75,10 @@
             </div>
         @else
             <div class="space-y-3">
-                <a href="{{ route('login') }}" onclick="finishOnboarding()" class="block w-full bg-emerald-600 text-white font-bold text-center py-4 rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 active:scale-95 transition-all text-lg">
+                <a href="{{ route('login') }}" class="block w-full bg-emerald-600 text-white font-bold text-center py-4 rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 active:scale-95 transition-all text-lg">
                     Log In
                 </a>
-                <a href="{{ route('register') }}" onclick="finishOnboarding()" class="block w-full bg-emerald-50 text-emerald-700 font-bold text-center py-4 rounded-2xl hover:bg-emerald-100 active:scale-95 transition-all text-lg border border-emerald-100">
+                <a href="{{ route('register') }}" class="block w-full bg-emerald-50 text-emerald-700 font-bold text-center py-4 rounded-2xl hover:bg-emerald-100 active:scale-95 transition-all text-lg border border-emerald-100">
                     Create Account
                 </a>
             </div>
@@ -81,9 +86,16 @@
     </div>
 
     <script>
-        function finishOnboarding() {
-            localStorage.setItem('onboarding_seen', 'true');
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered!', reg.scope))
+                    .catch(err => console.log('SW failed: ', err));
+            });
         }
     </script>
+    
+    <x-pwa-install-banner />
 </body>
 </html>

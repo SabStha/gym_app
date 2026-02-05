@@ -61,16 +61,19 @@ class RegistrationWizardController extends Controller
             // Goal
             $validated = $request->validate([
                 'goal_type' => ['required', 'in:lose,gain,maintain'],
-                'target_weight_kg' => ['nullable', 'required_if:goal_type,lose,gain', 'numeric', 'min:20', 'max:300'],
+                'target_weight_kg' => ['nullable', 'required_if:goal_type,lose,gain', 'numeric', 'min:1', 'max:300'],
             ]);
             
-            // If maintain, goal weight = current weight
+            // If maintain, target weight is null (as per request)
             if ($validated['goal_type'] === 'maintain') {
-                $validated['target_weight_kg'] = $data['current_weight_kg'] ?? null;
+                $validated['target_weight_kg'] = null;
             }
 
+            // Ensure we merge properly (if target_weight_kg was null in input but needed to be saved as null)
             $data = array_merge($data, $validated);
             session(['register_data' => $data]);
+            
+            // Explicitly redirect to Step 4
             return redirect()->route('register.wizard', ['step' => 4]);
         }
 
@@ -80,6 +83,18 @@ class RegistrationWizardController extends Controller
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
             ]);
             
+            // Prevent Duplicate Entry (Race condition / Double Submit)
+            if (User::where('email', $data['email'])->exists()) {
+                // Check if we are already logged in as this user (unlikely for guest route but possible if session persists)
+                 if (Auth::check() && Auth::user()->email === $data['email']) {
+                     return redirect(RouteServiceProvider::HOME);
+                 }
+                 
+                // otherwise, fail safely
+                return redirect()->route('register.wizard', ['step' => 1])
+                    ->withErrors(['email' => 'This email is already registered.']);
+            }
+
             // Create User
             $user = User::create([
                 'name' => $data['name'],
@@ -100,7 +115,7 @@ class RegistrationWizardController extends Controller
                  'goal_preset' => 'strength', // default
                  'default_increment_kg' => 2.5,
             ]);
-            $user->profile()->save($profile);
+            $user->userProfile()->save($profile);
 
             event(new Registered($user));
             Auth::login($user);

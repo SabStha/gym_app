@@ -32,6 +32,8 @@
             </div>
         </div>
     
+    <x-pwa-install-banner />
+
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
