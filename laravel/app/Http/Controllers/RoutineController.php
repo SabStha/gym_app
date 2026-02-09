@@ -13,7 +13,10 @@ class RoutineController extends Controller
      */
     public function index()
     {
-        $routines = auth()->user()->routines()->latest()->get();
+        $routines = auth()->user()->routines()
+            ->with(['routineDays.dayExercises.exercise'])
+            ->latest()
+            ->get();
         return view('routines.index', compact('routines'));
     }
 
@@ -22,7 +25,7 @@ class RoutineController extends Controller
      */
     public function create()
     {
-        return view('routines.create');
+        return view('routines.create', ['hide_bottom_nav' => true]);
     }
 
     /**
@@ -32,24 +35,40 @@ class RoutineController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'note' => 'nullable|string',
+            'template' => 'nullable|string',
         ]);
 
-        $routine = auth()->user()->routines()->create($validated);
+        $routine = auth()->user()->routines()->create([
+            'title' => $validated['title']
+        ]);
 
-        return redirect()->route('routines.show', $routine)->with('success', 'Routine created successfully.');
+        // Apply Template if selected
+        if (!empty($validated['template'])) {
+            \App\Services\RoutineTemplateService::applyTemplate($routine, $validated['template']);
+        } else {
+            // Custom Split: Auto-create default workout
+            $routine->routineDays()->create([
+                'day_name' => 'Workout A',
+                'order_index' => 0
+            ]);
+        }
+
+        // Always redirect to the first workout editor
+        $firstDay = $routine->routineDays()->orderBy('order_index')->first();
+        return redirect()->route('routine-days.show', [$routine, $firstDay])->with('success', 'Split created successfully.');
     }
 
     /**
      * Display the specified resource.
+     * Redirects to the first day of the routine if available.
      */
     public function show(Routine $routine)
     {
         $this->authorizeUser($routine);
-        
+
+        // Load routine details
         $routine->load(['routineDays.dayExercises.exercise']);
-        $exercises = auth()->user()->exercises()->orderBy('name')->get(); // For adding to days
-        // Merge with defaults if not custom only
+        $exercises = auth()->user()->exercises()->orderBy('name')->get(); 
         $defaultExercises = \App\Models\Exercise::whereNull('user_id')->orderBy('name')->get();
         $allExercises = $exercises->merge($defaultExercises)->sortBy('name');
 

@@ -59,12 +59,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/routines/{routine}/activate', [RoutineController::class, 'activate'])->name('routines.activate');
 
     // Routine Day Routes
+    Route::get('/routines/{routine}/days/{day}', [RoutineDayController::class, 'show'])->name('routine-days.show');
     Route::post('/routines/{routine}/days', [RoutineDayController::class, 'store'])->name('routine-days.store');
+    Route::put('/routine-days/{routineDay}', [RoutineDayController::class, 'update'])->name('routine-days.update');
     Route::delete('/routine-days/{routineDay}', [RoutineDayController::class, 'destroy'])->name('routine-days.destroy');
 
     // Day Exercise Routes
     Route::post('/routine-days/{routineDay}/exercises', [DayExerciseController::class, 'store'])->name('day-exercises.store');
     Route::delete('/day-exercises/{dayExercise}', [DayExerciseController::class, 'destroy'])->name('day-exercises.destroy');
+    
+    // Exercise Search
+    Route::get('/exercises/search', [App\Http\Controllers\ExerciseController::class, 'search'])->name('exercises.search');
 
     // Workout Routes
     Route::get('/workouts/start', [WorkoutController::class, 'create'])->name('workouts.create');

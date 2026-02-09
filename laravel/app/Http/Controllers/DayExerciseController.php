@@ -28,7 +28,14 @@ class DayExerciseController extends Controller
         // Although the Exercise list in controller already handles this visualization, strict backend check is good.
         // For MVP, assuming the validated exercise_id is valid.
 
-        $routineDay->dayExercises()->create($validated);
+        $dayExercise = $routineDay->dayExercises()->create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Exercise added successfully',
+                'day_exercise' => $dayExercise->load('exercise')
+            ]);
+        }
 
         return redirect()->route('routines.show', $routineDay->routine_id)->with('success', 'Exercise added to day.');
     }

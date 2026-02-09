@@ -39,7 +39,9 @@
             </main>
         </div>
 
-    @include('layouts.partials.bottom-nav')
+    @unless(isset($hide_bottom_nav) && $hide_bottom_nav)
+        @include('layouts.partials.bottom-nav')
+    @endunless
 
     <!-- Service Worker Registration -->
     <script>

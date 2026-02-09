@@ -54,48 +54,8 @@
         @endif
 
         <!-- Add Exercise Form -->
-        <div class="mt-4 pt-4 border-t border-gray-100">
-            <h4 class="text-sm font-bold text-gray-700 mb-2">Add Exercise</h4>
-            <form action="{{ route('day-exercises.store', $day) }}" method="POST" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-                @csrf
-                
-                <div class="md:col-span-3">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Exercise</label>
-                    <select name="exercise_id" class="w-full border-gray-300 rounded shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500" required>
-                        <option value="">Select...</option>
-                        @foreach($exercises as $ex)
-                            <option value="{{ $ex->id }}">{{ $ex->name }} ({{ $ex->muscle_group }})</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="md:col-span-1">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Order</label>
-                    <input type="number" name="order_index" value="{{ $day->dayExercises->count() + 1 }}" class="w-full border-gray-300 rounded shadow-sm text-sm p-2" required>
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Sets</label>
-                    <input type="number" name="target_sets" value="3" class="w-full border-gray-300 rounded shadow-sm text-sm p-2" required>
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Reps</label>
-                    <div class="flex space-x-1">
-                        <input type="number" name="rep_min" placeholder="Min" value="8" class="w-1/2 border-gray-300 rounded shadow-sm text-sm p-2" required>
-                        <input type="number" name="rep_max" placeholder="Max" value="12" class="w-1/2 border-gray-300 rounded shadow-sm text-sm p-2" required>
-                    </div>
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Inc Override</label>
-                    <input type="number" step="0.5" name="increment_override_kg" placeholder="Default" class="w-full border-gray-300 rounded shadow-sm text-sm p-2">
-                </div>
-
-                <div class="md:col-span-2">
-                    <button type="submit" class="w-full bg-gray-800 text-white rounded shadow-sm text-sm py-2 hover:bg-gray-700">Add</button>
-                </div>
-            </form>
+        <div class="mt-4 pt-4 border-t border-gray-100 pb-20">
+            @include('partials.exercise-picker', ['day' => $day])
         </div>
     </div>
 </div>
