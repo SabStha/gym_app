@@ -20,7 +20,7 @@
 </style>
 
 <!-- Main Layout: locked to 100dvh, no window scrolling -->
-<div class="fixed inset-0 z-40 bg-gray-50 dark:bg-gray-900 flex flex-col pb-[calc(4rem+env(safe-area-inset-bottom))]">
+<div class="fixed inset-0 z-40 bg-gray-50 dark:bg-gray-900 flex flex-col pb-[calc(9rem+env(safe-area-inset-bottom))]">
     
     <!-- 1. Header Section (Compressed) -->
     <div class="glass-header z-30 pt-safe-top shrink-0" 
@@ -209,23 +209,31 @@
             </div>
         @endif
         
-    <!-- Bottom Actions: Start Button + Add FAB -->
-    <div class="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] inset-x-0 px-6 z-40 flex items-center gap-4 pointer-events-none">
+    <!-- Bottom Actions: Start Button ONLY -->
+    <div class="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] inset-x-0 px-6 z-40 flex items-center justify-center pointer-events-none">
         
-        <!-- Start Workout Button -->
-        <form action="{{ route('workouts.start') }}" method="POST" class="flex-1 pointer-events-auto">
+        <!-- Start Workout Button (Full Width Hero) -->
+        <form action="{{ route('workouts.start') }}" method="POST" class="w-full max-w-sm pointer-events-auto">
             @csrf
             <input type="hidden" name="routine_day_id" value="{{ $day->id }}">
-            <button type="submit" class="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-500/30 flex items-center justify-center font-black tracking-wide text-lg uppercase transition-all active:scale-95">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Start
+            <button type="submit" class="group relative w-full h-16 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-3xl shadow-2xl shadow-gray-900/20 flex items-center justify-between px-2 overflow-hidden transition-all active:scale-95 hover:shadow-3xl">
+                <!-- Button Glow -->
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-white/10 to-emerald-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                
+                <!-- Icon Circle -->
+                <div class="w-12 h-12 bg-white/20 dark:bg-black/10 rounded-full flex items-center justify-center ml-1">
+                    <svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                
+                <!-- Text -->
+                <span class="text-lg font-black tracking-widest uppercase mr-auto ml-4">Start Workout</span>
+                
+                <!-- Chevron -->
+                <div class="mr-4 opacity-50 group-hover:translate-x-1 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                </div>
             </button>
         </form>
-
-        <!-- Add Exercise FAB -->
-        <button onclick="openAddExercise()" class="pointer-events-auto shrink-0 w-14 h-14 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-        </button>
     </div>
 </div>
 
