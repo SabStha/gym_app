@@ -32,7 +32,7 @@
             </div>
         </div>
     
-    <x-pwa-install-banner />
+
 
     <!-- Service Worker Registration -->
     <script>
