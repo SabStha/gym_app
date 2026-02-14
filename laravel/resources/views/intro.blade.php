@@ -6,8 +6,14 @@
     <meta name="theme-color" content="#10B981">
     
     <!-- PWA Manifest & Icons -->
+    <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    
+    <!-- iOS PWA Splashes & Status Bar -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-startup-image" href="/icons/icon-512.png">
 
     <title>{{ config('app.name', 'Gym Companion') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,13 +48,11 @@
                 // Determine destination
                 if (this.isAuthenticated) {
                     this.redirectUrl = "{{ route('hub') }}";
-                } else if (this.onboardingSeen) {
-                    this.redirectUrl = "{{ route('login') }}";
                 } else {
                     this.redirectUrl = "/onboarding/1";
                 }
 
-                this.delay = 1500; // 1.5s for branding
+                this.delay = 2500; // 2.5s to allow PWA banner to triggering
                 
                 this.init();
             }
