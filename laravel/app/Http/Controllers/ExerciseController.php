@@ -46,4 +46,30 @@ class ExerciseController extends Controller
 
         return response()->json($exercises->orderBy('name')->get());
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'muscle_group' => 'required|string|max:50',
+            'image' => 'nullable|image|max:5120', // Max 5MB
+        ]);
+
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . \Illuminate\Support\Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images/exercises/custom'), $filename);
+            $imageUrl = asset('images/exercises/custom/' . $filename);
+        }
+
+        $exercise = Exercise::create([
+            'user_id' => auth()->id(),
+            'name' => $request->name,
+            'muscle_group' => $request->muscle_group,
+            'image_url' => $imageUrl,
+        ]);
+
+        return response()->json($exercise);
+    }
 }

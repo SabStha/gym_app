@@ -60,6 +60,53 @@ class DashboardController extends Controller
 
         $topExercise = $topExerciseStat ? $topExerciseStat->exercise->name : 'N/A';
 
-        return view('dashboard', compact('activeRoutine', 'currentWorkout', 'lastWorkout', 'workoutsThisWeek', 'totalVolume', 'topExercise'));
+        // Next Session Logic
+        $nextSession = null;
+        $upcomingSessions = collect();
+
+        if ($activeRoutine) {
+            $days = $activeRoutine->routineDays()->orderBy('order_index')->get();
+            
+            if ($days->isNotEmpty()) {
+                // Find last completed workout for this routine
+                $lastRoutineWorkout = \App\Models\Workout::where('user_id', auth()->id())
+                    ->where('status', 'completed')
+                    ->whereHas('routineDay', function($q) use ($activeRoutine) {
+                        $q->where('routine_id', $activeRoutine->id);
+                    })
+                    ->latest('finished_at')
+                    ->first();
+
+                $nextIndex = 0;
+                if ($lastRoutineWorkout && $lastRoutineWorkout->routineDay) {
+                    // Find index of last workout's day
+                    $lastDayIndex = $days->search(function($day) use ($lastRoutineWorkout) {
+                        return $day->id === $lastRoutineWorkout->routine_day_id;
+                    });
+
+                    if ($lastDayIndex !== false) {
+                        $nextIndex = ($lastDayIndex + 1) % $days->count();
+                    }
+                }
+
+                $nextSession = $days[$nextIndex];
+
+                // Upcoming (Next 3)
+                for ($i = 1; $i <= 3; $i++) {
+                    $upcomingSessions->push($days[($nextIndex + $i) % $days->count()]);
+                }
+            }
+        }
+
+        return view('dashboard', compact(
+            'activeRoutine', 
+            'currentWorkout', 
+            'lastWorkout', 
+            'workoutsThisWeek', 
+            'totalVolume', 
+            'topExercise',
+            'nextSession',
+            'upcomingSessions'
+        ));
     }
 }

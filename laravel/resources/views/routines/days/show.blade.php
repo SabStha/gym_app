@@ -157,16 +157,24 @@
                         </div>
 
                         <!-- Hero Icon/Illustration (Centered) -->
-                        <div class="flex-1 flex items-center justify-center p-6 relative">
-                            <!-- Background Pattern/Blob -->
-                            <div class="absolute inset-0 flex items-center justify-center opacity-10 dark:opacity-5 pointer-events-none">
-                                <div class="w-48 h-48 bg-emerald-500 rounded-full blur-3xl"></div>
-                            </div>
-                            
-                            <!-- Icon -->
-                            <div class="w-32 h-32 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shadow-inner relative z-10">
-                                <svg class="w-16 h-16 text-gray-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            </div>
+                        <div class="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
+                            @if($exercise->exercise->image_url)
+                                <img src="{{ $exercise->exercise->image_url }}" 
+                                     class="absolute inset-0 w-full h-full object-cover opacity-90"
+                                     alt="{{ $exercise->exercise->name }}"
+                                     onerror="this.style.display='none'">
+                                <div class="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent dark:from-gray-800 dark:to-transparent"></div>
+                            @else
+                                <!-- Background Pattern/Blob -->
+                                <div class="absolute inset-0 flex items-center justify-center opacity-10 dark:opacity-5 pointer-events-none">
+                                    <div class="w-48 h-48 bg-emerald-500 rounded-full blur-3xl"></div>
+                                </div>
+                                
+                                <!-- Icon -->
+                                <div class="w-32 h-32 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shadow-inner relative z-10">
+                                    <svg class="w-16 h-16 text-gray-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Bottom Stats Tiles -->

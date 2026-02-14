@@ -16,8 +16,13 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $totalWorkouts = \App\Models\Workout::where('user_id', $request->user()->id)
+            ->whereNotNull('finished_at')
+            ->count();
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'totalWorkouts' => $totalWorkouts,
         ]);
     }
 

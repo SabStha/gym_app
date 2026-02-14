@@ -97,5 +97,12 @@
     </script>
     
     <x-pwa-install-banner />
+
+    <script>
+        // Set onboarding seen flag if on the final step
+        @if($step == 3)
+            localStorage.setItem('onboarding_seen', 'true');
+        @endif
+    </script>
 </body>
 </html>

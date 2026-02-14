@@ -11,6 +11,7 @@
         "php": "^8.0.2",
         "fakerphp/faker": "^1.24",
         "guzzlehttp/guzzle": "^7.2",
+        "laragear/webauthn": "^1.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7"

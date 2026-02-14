@@ -41,7 +41,13 @@ Route::view('/offline', 'offline');
 // Dashboard Route with Controller
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+// Workout Hub
+Route::get('/hub', [App\Http\Controllers\HubController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('hub');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -69,13 +75,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/day-exercises/{dayExercise}', [DayExerciseController::class, 'destroy'])->name('day-exercises.destroy');
     
     // Exercise Search
+    Route::post('/exercises', [App\Http\Controllers\ExerciseController::class, 'store'])->name('exercises.store');
     Route::get('/exercises/search', [App\Http\Controllers\ExerciseController::class, 'search'])->name('exercises.search');
 
     // Workout Routes
     Route::get('/workouts/start', [WorkoutController::class, 'create'])->name('workouts.create');
-    Route::post('/workouts/start', [WorkoutController::class, 'start'])->name('workouts.start');
+    Route::post('/workouts', [WorkoutController::class, 'store'])->name('workouts.store'); // Added from instruction
+    Route::post('/workouts/start', [WorkoutController::class, 'store'])->name('workouts.start');
     Route::get('/workouts/{workout}', [WorkoutController::class, 'show'])->name('workouts.show');
     Route::post('/workouts/{workout}/finish', [WorkoutController::class, 'finish'])->name('workouts.finish');
+    Route::post('/workouts/{workout}/reorder', [WorkoutController::class, 'reorder'])->name('workouts.reorder'); // Added from instruction
+    Route::patch('/workouts/{workout}/exercises/{workoutExercise}/status', [WorkoutController::class, 'updateStatus'])->name('workouts.exercises.status');
+    
+    // Queue & Navigation
+    Route::get('/workouts/{workout}/queue', [WorkoutController::class, 'queue'])->name('workouts.queue');
+    Route::post('/workouts/{workout}/go-to', [WorkoutController::class, 'setCurrentExercise'])->name('workouts.go-to');
+    Route::post('/workouts/{workout}/skip', [WorkoutController::class, 'skipExercise'])->name('workouts.skip'); // Added from instruction
     
     // Set Logic (AJAX)
     Route::post('/workouts/{workout}/sets', [App\Http\Controllers\WorkoutSetController::class, 'store'])->name('workout-sets.store');
@@ -84,6 +99,16 @@ Route::middleware('auth')->group(function () {
     // History Routes
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
     Route::get('/history/{workout}', [HistoryController::class, 'show'])->name('history.show');
+
+    // Nutrition & Food Tracker
+    Route::get('/nutrition', [App\Http\Controllers\NutritionController::class, 'index'])->name('nutrition.index');
+    
+    Route::get('/foods/search', [App\Http\Controllers\FoodController::class, 'index'])->name('foods.search');
+    Route::get('/foods/recents', [App\Http\Controllers\FoodController::class, 'recents'])->name('foods.recents');
+    Route::post('/foods', [App\Http\Controllers\FoodController::class, 'store'])->name('foods.store');
+    
+    Route::post('/food-entries', [App\Http\Controllers\FoodEntryController::class, 'store'])->name('food-entries.store');
+    Route::delete('/food-entries/{foodEntry}', [App\Http\Controllers\FoodEntryController::class, 'destroy'])->name('food-entries.destroy');
 
     // Progress Routes
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');

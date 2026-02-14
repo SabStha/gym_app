@@ -19,10 +19,11 @@ class ProgressController extends Controller
 
     public function index(Request $request)
     {
-        // Get list of exercises the user has actually performed in completed workouts
-        // We join through workout_exercises -> workouts
-        $exercises = Exercise::whereHas('workoutExercises.workout', function ($query) {
-            $query->where('user_id', auth()->id())
+        $user = auth()->user();
+
+        // --- 1. Exercise Progress (Existing) ---
+        $exercises = Exercise::whereHas('workoutExercises.workout', function ($query) use ($user) {
+            $query->where('user_id', $user->id)
                   ->where('status', 'completed');
         })
         ->orderBy('name')
@@ -31,13 +32,14 @@ class ProgressController extends Controller
         $selectedExercise = null;
         $history = [];
         $analysis = null;
+        $strengthChartData = ['labels' => [], 'data' => []];
 
         if ($request->has('exercise_id')) {
             $selectedExercise = Exercise::find($request->exercise_id);
 
             if ($selectedExercise) {
                 // Load last 5 completed sessions
-                $workouts = Workout::where('user_id', auth()->id())
+                $workouts = Workout::where('user_id', $user->id)
                     ->where('status', 'completed')
                     ->whereHas('workoutExercises', function ($q) use ($selectedExercise) {
                         $q->where('exercise_id', $selectedExercise->id);
@@ -51,11 +53,11 @@ class ProgressController extends Controller
 
                 // Compute best set for each session
                 foreach ($workouts as $workout) {
-                    $we = $workout->workoutExercises->first(); // Should be only one per exercise per workout usually
+                    $we = $workout->workoutExercises->first(); 
                     if (!$we) continue;
 
                     $bestSet = $we->workoutSets->sortByDesc(function ($set) {
-                        return $set->weight_kg * 1000 + $set->reps; // Heuristic: weight dominant, then reps
+                        return $set->weight_kg * 1000 + $set->reps; 
                     })->first();
 
                     if ($bestSet) {
@@ -68,26 +70,70 @@ class ProgressController extends Controller
                 }
 
                 // Chart Data (Ascending for Chart)
-                $chartData = [
-                    'labels' => [],
-                    'data' => []
-                ];
                 $reversedHistory = array_reverse($history);
                 foreach ($reversedHistory as $h) {
-                    $chartData['labels'][] = $h['date']->format('M d');
-                    $chartData['data'][] = $h['weight'];
+                    $strengthChartData['labels'][] = $h['date']->format('M d');
+                    $strengthChartData['data'][] = $h['weight'];
                 }
 
                 // Analyze
-                $analysis = $this->progressionService->analyze(auth()->user(), $selectedExercise, $history);
+                $analysis = $this->progressionService->analyze($user, $selectedExercise, $history);
             }
         }
-         
-        // Default empty chart data if not set
-        if (!isset($chartData)) {
-            $chartData = ['labels' => [], 'data' => []];
+
+        // --- 2. Body & Nutrition Analysis (New) ---
+        
+        // A. Weight Logs (Last 30 Days)
+        $weightLogs = \App\Models\UserWeightLog::where('user_id', $user->id)
+            ->whereDate('date', '>=', now()->subDays(30))
+            ->orderBy('date', 'asc')
+            ->get();
+            
+        $weightChartData = [
+            'labels' => $weightLogs->pluck('date')->map(fn($d) => $d->format('M d'))->toArray(),
+            'data' => $weightLogs->pluck('weight')->toArray(),
+        ];
+        
+        // B. Nutrition (Last 7 Days)
+        $nutritionLogs = \App\Models\FoodEntry::where('user_id', $user->id)
+            ->whereDate('date', '>=', now()->subDays(7))
+            ->get()
+            ->groupBy(fn($e) => $e->date->format('Y-m-d'));
+            
+        $calorieChartData = ['labels' => [], 'actual' => [], 'target' => []];
+        $macroAverages = ['protein' => 0, 'carbs' => 0, 'fat' => 0];
+        $daysCount = 0;
+        
+        $period = \Carbon\CarbonPeriod::create(now()->subDays(6), now());
+        
+        foreach ($period as $date) {
+            $d = $date->format('Y-m-d');
+            $dayEntries = $nutritionLogs->get($d, collect());
+            
+            $actualCals = $dayEntries->sum('calories');
+            $targetCals = $user->userProfile->target_calories ?? 2000;
+            
+            $calorieChartData['labels'][] = $date->format('D'); // Mon, Tue...
+            $calorieChartData['actual'][] = $actualCals;
+            $calorieChartData['target'][] = $targetCals;
+            
+            if ($dayEntries->isNotEmpty()) {
+                $daysCount++;
+                $macroAverages['protein'] += $dayEntries->sum('protein');
+                $macroAverages['carbs'] += $dayEntries->sum('carbs');
+                $macroAverages['fat'] += $dayEntries->sum('fat');
+            }
+        }
+        
+        if ($daysCount > 0) {
+            $macroAverages['protein'] /= $daysCount;
+            $macroAverages['carbs'] /= $daysCount;
+            $macroAverages['fat'] /= $daysCount;
         }
 
-        return view('progress.index', compact('exercises', 'selectedExercise', 'history', 'analysis', 'chartData'));
+        return view('progress.index', compact(
+            'exercises', 'selectedExercise', 'history', 'analysis', 'strengthChartData',
+            'weightLogs', 'weightChartData', 'calorieChartData', 'macroAverages'
+        ));
     }
 }

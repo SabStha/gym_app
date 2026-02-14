@@ -13,6 +13,7 @@ class WorkoutExercise extends Model
         'workout_id',
         'exercise_id',
         'order_index',
+        'status',
         'difficulty',
         'recommendation_json',
         'ai_explanation',

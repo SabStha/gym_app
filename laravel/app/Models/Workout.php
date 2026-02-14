@@ -19,6 +19,7 @@ class Workout extends Model
         'duration_min',
         'status',
         'note',
+        'current_workout_exercise_id',
     ];
 
     protected $casts = [

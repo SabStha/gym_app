@@ -37,8 +37,18 @@
                 this.timerId = null;
                 // Check auth status rendered from Blade
                 this.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
-                this.redirectUrl = this.isAuthenticated ? "{{ route('dashboard') }}" : "/onboarding/1";
-                this.delay = 1200; // 1.2s
+                this.onboardingSeen = localStorage.getItem('onboarding_seen') === 'true';
+                
+                // Determine destination
+                if (this.isAuthenticated) {
+                    this.redirectUrl = "{{ route('hub') }}";
+                } else if (this.onboardingSeen) {
+                    this.redirectUrl = "{{ route('login') }}";
+                } else {
+                    this.redirectUrl = "/onboarding/1";
+                }
+
+                this.delay = 1500; // 1.5s for branding
                 
                 this.init();
             }
@@ -53,7 +63,6 @@
             }
 
             start() {
-                console.log('Splash timer started');
                 this.timerId = setTimeout(() => {
                     this.navigate();
                 }, this.delay);
@@ -61,17 +70,12 @@
 
             pause() {
                 if (this.timerId) {
-                    console.log('Splash timer paused (PWA Banner)');
                     clearTimeout(this.timerId);
                     this.timerId = null;
                 }
             }
 
             resume() {
-                console.log('Splash timer resumed');
-                // Immediate navigation or short restart
-                // Since this is a simple splash, simply navigating now is fine
-                // or we could restart the full delay. Let's restart a short delay for smoothness.
                 this.timerId = setTimeout(() => {
                     this.navigate();
                 }, 500); 
